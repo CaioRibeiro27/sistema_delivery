@@ -1,52 +1,53 @@
 import React, { useState } from 'react';
 import './Login.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; 
 import InputGroup from '../../components/InputGroup/InputGroup';
 import SocialLogin from '../../components/SocialLogin/SocialLogin';
 
 function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const [email, setEmail] = useState('');
+ const [password, setPassword] = useState('');
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log('Dados do Login:', { email, password });
-    alert('Login (fictício) enviado! Verifique o console.');
-  };
+  const navigate = useNavigate(); 
 
-  return (
-    <div className="login-container">
-      <h2>Faça seu Login</h2>
+ const handleSubmit = (event) => {
+ event.preventDefault();
+ console.log('Dados do Login:', { email, password });
 
-      <form onSubmit={handleSubmit}>
-        <InputGroup
-          label="Seu e-mail"
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+    navigate('/home'); 
+ };
 
-        <InputGroup
-          label="Sua senha"
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+ return (
+<div className="login-container">
+<h2>Faça seu Login</h2>
+<form onSubmit={handleSubmit}>
+ <InputGroup
+label="Seu e-mail"
+ type="email"
+ id="email"
+ value={email}
+ onChange={(e) => setEmail(e.target.value)}
+ />
 
-        <button type="submit" className="login-button">Entrar</button>
-      </form>
+ <InputGroup
+ label="Sua senha"
+type="password"
+id="password"
+ value={password}
+ onChange={(e) => setPassword(e.target.value)}
+/>
+ <button type="submit" className="login-button">Entrar</button>
+</form>
 
-      <div className="separator">ou</div>
+<div className="separator">ou</div>
 
-      <SocialLogin />
+ <SocialLogin />
 
-      <p className="signup-link">
-        Não possui conta? Faça seu <Link to="/cadastro">cadastro</Link>
-      </p>
-    </div>
-  );
+ <p className="signup-link">
+ Não possui conta? Faça seu <Link to="/cadastro">cadastro</Link>
+ </p>
+ </div>
+);
 }
 
 export default Login;

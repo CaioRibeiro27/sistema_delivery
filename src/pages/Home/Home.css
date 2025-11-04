@@ -1,0 +1,12 @@
+.map-content {
+  height: 100vh;
+  transition: padding-left 0.3s ease-in-out;
+}
+
+.map-content.sidebar-closed {
+  padding-left: 80px;
+}
+
+.map-content.sidebar-open {
+  padding-left: 300px;
+}
