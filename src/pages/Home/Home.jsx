@@ -1,27 +1,35 @@
 import React, { useState } from 'react';
-import Sidebar from '../../components/Sidebar/Sidebar'; 
+import Sidebar from '../../components/Sidebar/Sidebar';
+import OrderHistory from '../../components/OrderHistory/OrderHistory';
 import './Home.css';
 
 function Home() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const handleMapClick = () => {
-    if (isOpen) {
-      setIsOpen(false);
+    if (isSidebarOpen) {
+      setIsSidebarOpen(false);
     }
   };
 
   return (
     <div className="home-container">
       <Sidebar 
-        isOpen={isOpen} 
-        setIsOpen={setIsOpen} 
+        isOpen={isSidebarOpen} 
+        setIsOpen={setIsSidebarOpen}
+        onHistoryClick={() => setIsHistoryOpen(true)}
       />
+      
       <div 
-        className={`map-content ${isOpen ? 'sidebar-open' : 'sidebar-closed'}`}
+        className={`map-content ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}
         onClick={handleMapClick}
       >
+
       </div>
+
+      { isHistoryOpen && <OrderHistory onClose={() => setIsHistoryOpen(false)} /> }
+
     </div>
   );
 }
