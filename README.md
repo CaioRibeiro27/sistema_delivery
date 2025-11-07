@@ -1,70 +1,98 @@
-# Getting Started with Create React App
+# 🍔 Sistema de Delivery (Full-Stack)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Este é um projeto de estudo de um aplicativo de delivery completo, seu desenvolvimento foi feito com: React, Node.js (Express) e MySQL.
 
-## Available Scripts
+O projeto inclui cadastro e login de usuários com criptografia de senha, e está estruturado com um frontend (React) que consome uma API REST (Node.js) conectada a um banco de dados relacional (MySQL).
 
-In the project directory, you can run:
+## 🛠️ Tecnologias Utilizadas
 
-### `npm start`
+- **Frontend:** React, React Router, React Icons
+- **Backend:** Node.js, Express
+- **Banco de Dados:** MySQL
+- **Autenticação:** Bcryptjs (para hash de senhas)
+- **Conexão:** `mysql2`, `cors`, `dotenv`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🚀 Como Rodar o Projeto
 
-### `npm test`
+Siga estas instruções para configurar e rodar o projeto completo em sua máquina local.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Pré-requisitos
 
-### `npm run build`
+Antes de começar, você precisará ter as seguintes ferramentas instaladas:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- [Node.js](https://nodejs.org/) (que já vem com o npm)
+- [Git](https://git-scm.com/)
+- Um servidor MySQL (recomendo [XAMPP](https://www.apachefriends.org/pt_br/index.html), pois facilita a visualização com o phpMyAdmin)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 1. Configuração do Banco de Dados
 
-### `npm run eject`
+1.  Inicie os módulos **Apache** e **MySQL** no seu painel de controle do XAMPP.
+2.  Abra o **phpMyAdmin** (clicando em "Admin" na linha do MySQL no XAMPP).
+3.  Crie um novo banco de dados. Clique em **"Novo"** (ou "New") na barra lateral e dê o nome de `Sistema_delivery`.
+4.  Com o banco `Sistema_delivery` selecionado no menu, clique na aba **"Importar"** (ou "Import") no topo.
+5.  Clique em "Escolher arquivo" e selecione o arquivo `backend/Sistema delivery.sql` que está neste projeto.
+6.  Desça e clique em **"Executar"** (ou "Go"). As tabelas (`usuario`, `pedido`, etc.) serão criadas.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 2. Configuração do Backend
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1.  Clone este repositório para sua máquina:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+    ```bash
+    git clone https://github.com/CaioRibeiro27/sistema_delivery.git
+    cd SEU-REPOSITORIO
+    ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+2.  Navegue até a pasta do backend e instale as dependências:
 
-## Learn More
+    ```bash
+    cd backend
+    npm install
+    ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+3.  Crie um arquivo chamado `.env` dentro desta pasta (`backend/.env`).
+4.  Abra este `.env` e cole o seguinte conteúdo. (Estes são os padrões do XAMPP, então se você não mudou a senha do seu MySQL, funcionará direto).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+    ```
+    DB_HOST=localhost
+    DB_USER=root
+    DB_PASSWORD=
+    DB_NAME=Sistema_delivery
+    ```
 
-### Code Splitting
+### 3. Configuração do Frontend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+1.  Abra um **novo terminal**.
+2.  Navegue até a pasta raiz do projeto (a que tem o `src/`):
+    ```bash
+    cd SEU-REPOSITORIO
+    ```
+3.  Instale as dependências do React:
+    ```bash
+    npm install
+    ```
 
-### Analyzing the Bundle Size
+### 4. Ligando Tudo!
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Você precisará de **dois terminais** rodando simultaneamente.
 
-### Making a Progressive Web App
+- **Terminal 1 (Para rodar o Backend):**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+  ```bash
+  # (Dentro da pasta /backend)
+  npm start
+  ```
 
-### Advanced Configuration
+  _(Você deve ver a mensagem: 🚀 Servidor backend rodando na porta 3001)_
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- **Terminal 2 (Para rodar o Frontend):**
+  ```bash
+  # (Dentro da pasta raiz do projeto)
+  npm start
+  ```
+  _(Seu navegador abrirá automaticamente em `http://localhost:3000`)_
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Pronto! Agora você pode acessar `http://localhost:3000/cadastro`, criar uma conta, e verificar os dados aparecendo no phpMyAdmin.
