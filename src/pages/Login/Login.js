@@ -20,21 +20,20 @@ function Login() {
         },
         body: JSON.stringify({ email, password }),
       });
-
       const data = await response.json();
 
       if (data.success) {
+        localStorage.setItem("user", JSON.stringify(data.user));
         navigate("/home");
       } else {
         alert("Falha no login: " + data.message);
       }
     } catch (error) {
       console.error("Erro de conexão:", error);
-      alert(
-        "Não foi possível conectar ao servidor. Tente novamente mais tarde."
-      );
+      alert("Não foi possível conectar ao servidor.");
     }
   };
+
   return (
     <div className="login-container">
       <h2>Faça seu Login</h2>

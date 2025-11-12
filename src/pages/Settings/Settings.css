@@ -1,0 +1,131 @@
+.settings-page {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+
+.settings-sidebar {
+  width: 280px;
+  background-color: #fff;
+  border-right: 1px solid #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+}
+
+.settings-sidebar h3 {
+  font-size: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: #333;
+}
+
+.settings-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.settings-user-profile svg {
+  color: #495057;
+}
+
+.settings-user-profile strong {
+  font-size: 1rem;
+  color: #212529;
+}
+
+.settings-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.settings-menu li {
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #495057;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.settings-menu li.active {
+  background-color: #dee2e6;
+  color: #000;
+}
+
+.settings-menu li:hover {
+  background-color: #e2e6ea;
+}
+
+.settings-back-arrow {
+  margin-top: auto;
+  color: #495057;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.settings-content {
+  flex-grow: 1;
+  padding: 40px;
+  background-color: #d9d9d9;
+}
+
+.settings-content h2 {
+  font-size: 2rem;
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.setting-row span {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.theme-toggle {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.theme-btn {
+  padding: 8px 16px;
+  border: none;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.theme-btn.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.volume-controls {
+  display: flex;
+  gap: 16px;
+  color: #555;
+}
+
+.volume-controls svg {
+  cursor: pointer;
+}

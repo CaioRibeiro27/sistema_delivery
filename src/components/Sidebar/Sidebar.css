@@ -52,8 +52,8 @@
 }
 
 .sidebar.open .user-info {
-  margin-left: 15px;
-  width: auto;
+  margin-left: 20px;
+  width: 0;
   opacity: 1;
   visibility: visible;
   transition-delay: 0.1s;
