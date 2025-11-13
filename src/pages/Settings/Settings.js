@@ -1,68 +1,85 @@
 import React, { useState, useEffect } from "react";
 import "./Settings.css";
 import { useNavigate } from "react-router-dom";
-import {
-  FaUserCircle,
-  FaArrowLeft,
-  FaVolumeUp,
-  FaVolumeDown,
-  FaVolumeMute,
-  FaVolumeOff,
-} from "react-icons/fa";
+import { FaUserCircle, FaArrowLeft } from "react-icons/fa";
+
+import GeneralSettings from "../../components/GeneralSettings/GeneralSettings";
+import PaymentSettings from "../../components/PaymentSettings/PaymentSettings";
 
 function Settings() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [activeTab, setActiveTab] = useState("gerais");
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
-    } else {
-      console.warn("Nenhum usuário logado, redirecionando...");
     }
   }, []);
 
+  const renderActiveTabContent = () => {
+    switch (activeTab) {
+      case "gerais":
+        return (
+          <GeneralSettings
+            isDarkMode={isDarkMode}
+            setIsDarkMode={setIsDarkMode}
+          />
+        );
+      case "pagamentos":
+        if (!user) {
+          return <div>Carregando informações do usuário...</div>;
+        }
+        return <PaymentSettings userId={user.id} />;
+
+      case "perfil":
+        return <div>Em breve: Perfil</div>;
+      default:
+        return (
+          <GeneralSettings
+            isDarkMode={isDarkMode}
+            setIsDarkMode={setIsDarkMode}
+          />
+        );
+    }
+  };
+
   return (
-    <div className="settings-page">
+    <div className={`settings-page ${isDarkMode ? "dark-mode" : ""}`}>
+      {" "}
       <nav className="settings-sidebar">
-        <h3>Configurações</h3>
-
+        <h3>Configurações</h3>{" "}
         <div className="settings-user-profile">
-          <FaUserCircle size={24} />
-          <strong>{user ? user.nome : "Carregando..."}</strong>
+          <FaUserCircle size={24} />{" "}
+          <strong>{user ? user.nome : "Carregando..."}</strong>{" "}
         </div>
-
         <ul className="settings-menu">
-          <li className="active">Configurações gerais</li>
-          <li>Formas de pagamentos</li>
-          <li>Perfil</li>
+          <li
+            className={activeTab === "gerais" ? "active" : ""}
+            onClick={() => setActiveTab("gerais")}
+          >
+            Configurações gerais
+          </li>
+          <li
+            className={activeTab === "pagamentos" ? "active" : ""}
+            onClick={() => setActiveTab("pagamentos")}
+          >
+            Formas de pagamentos
+          </li>
+          <li
+            className={activeTab === "perfil" ? "active" : ""}
+            onClick={() => setActiveTab("perfil")}
+          >
+            Perfil
+          </li>
         </ul>
-
         <div className="settings-back-arrow" onClick={() => navigate("/home")}>
           <FaArrowLeft size={20} />
         </div>
-      </nav>
-      <main className="settings-content">
-        <h2>Tela e som</h2>
-        <div className="setting-row">
-          <span>Tema</span>
-          <div className="theme-toggle">
-            <button className="theme-btn active">Claro</button>
-            <button className="theme-btn">Escuro</button>
-          </div>
-        </div>
-
-        <div className="setting-row">
-          <span>Notificação</span>
-          <div className="volume-controls">
-            <FaVolumeOff size={20} />
-            <FaVolumeMute size={20} />
-            <FaVolumeDown size={20} />
-            <FaVolumeUp size={20} />
-          </div>
-        </div>
-      </main>
+      </nav>{" "}
+      <main className="settings-content">{renderActiveTabContent()}</main>
     </div>
   );
 }

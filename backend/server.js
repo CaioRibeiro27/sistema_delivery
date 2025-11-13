@@ -92,6 +92,53 @@ app.post("/api/login", (req, res) => {
   });
 });
 
+/*Rota cartão*/
+/*Buscar cartão*/
+app.get("/api/cards/:userId", (req, res) => {
+  const { userId } = req.params;
+  const sql =
+    "SELECT id_cartao, numero_cartao, bandeira, nome_titular, data_vencimento FROM cartao WHERE id_usuario = ?";
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error("Erro ao buscar cartões:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro no servidor." });
+    }
+
+    res.status(200).json({ success: true, cards: results });
+  });
+});
+/*Adicionar cartão*/
+app.post("/api/cards", (req, res) => {
+  const { numero_cartao, bandeira, nome_titular, data_vencimento, id_usuario } =
+    req.body;
+  const sql =
+    "INSERT INTO cartao (numero_cartao, bandeira, nome_titular, data_vencimento, id_usuario) VALUES (?, ?, ?, ?, ?)";
+
+  db.query(
+    sql,
+    [numero_cartao, bandeira, nome_titular, data_vencimento, id_usuario],
+    (err, result) => {
+      if (err) {
+        console.error("Erro ao salvar cartão:", err);
+        return res
+          .status(500)
+          .json({ success: false, message: "Erro ao salvar cartão." });
+      }
+      // Retorna o ID do novo cartão inserido
+      res
+        .status(201)
+        .json({
+          success: true,
+          message: "Cartão adicionado!",
+          cardId: result.insertId,
+        });
+    }
+  );
+});
+
 app.listen(port, () => {
   console.log(`🚀 Servidor backend rodando na porta ${port}`);
 });
