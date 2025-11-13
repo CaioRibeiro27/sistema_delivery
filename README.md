@@ -16,11 +16,9 @@ O projeto inclui cadastro e login de usuários com criptografia de senha, e est�
 
 ## 🚀 Como Rodar o Projeto
 
-Siga estas instruções para configurar e rodar o projeto completo em sua máquina local.
-
 ### Pré-requisitos
 
-Antes de começar, você precisará ter as seguintes ferramentas instaladas:
+Ferramentas necessárias:
 
 - [Node.js](https://nodejs.org/) (que já vem com o npm)
 - [Git](https://git-scm.com/)
@@ -77,7 +75,7 @@ Antes de começar, você precisará ter as seguintes ferramentas instaladas:
 
 ### 4. Ligando Tudo!
 
-Você precisará de **dois terminais** rodando simultaneamente.
+Serão neccessarios **dois terminais** rodando simultaneamente.
 
 - **Terminal 1 (Para rodar o Backend):**
 
