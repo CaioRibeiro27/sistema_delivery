@@ -9,6 +9,11 @@ function PaymentSettings({ userId }) {
   const [nomeTitular, setNomeTitular] = useState("");
   const [dataVencimento, setDataVencimento] = useState("");
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [editNomeTitular, setEditNomeTitular] = useState("");
+  const [editDataVencimento, setEditDataVencimento] = useState("");
+
   const fetchCards = async () => {
     if (!userId) return;
     try {
@@ -61,10 +66,75 @@ function PaymentSettings({ userId }) {
     }
   };
 
+  const openEditModal = (card, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setSelectedCard(card);
+    setEditNomeTitular(card.nome_titular);
+    setEditDataVencimento(card.data_vencimento);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateCard = async (e) => {
+    e.preventDefault();
+    if (!selectedCard) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:3001/api/cards/${selectedCard.id_cartao}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nome_titular: editNomeTitular,
+            data_vencimento: editDataVencimento,
+          }),
+        }
+      );
+      const data = await response.json();
+      if (data.success) {
+        alert("Cartão atualizado!");
+        setIsEditModalOpen(false);
+        fetchCards();
+      } else {
+        alert("Erro ao atualizar cartão: " + data.message);
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar cartão:", error);
+    }
+  };
+
+  const handleDeleteCard = async () => {
+    if (!selectedCard) return;
+
+    if (window.confirm("Tem certeza que deseja remover este cartão?")) {
+      try {
+        const response = await fetch(
+          `http://localhost:3001/api/cards/${selectedCard.id_cartao}`,
+          {
+            method: "DELETE",
+          }
+        );
+        const data = await response.json();
+        if (data.success) {
+          alert("Cartão removido!");
+          setIsEditModalOpen(false);
+          fetchCards();
+        } else {
+          alert("Erro ao remover cartão: " + data.message);
+        }
+      } catch (error) {
+        console.error("Erro ao remover cartão:", error);
+      }
+    }
+  };
+
   return (
     <div className="payment-content">
       <h2>Formas de pagamento</h2>
       <p className="saldo-conta">Saldo em conta: ----</p>
+
       <div className="card-list">
         {cards.map((card) => (
           <div className="card-item" key={card.id_cartao}>
@@ -80,7 +150,11 @@ function PaymentSettings({ userId }) {
               </span>
             </div>
 
-            <a href="#" className="card-edit-link">
+            <a
+              href="#"
+              className="card-edit-link"
+              onClick={(e) => openEditModal(card, e)}
+            >
               Editar
             </a>
           </div>
@@ -161,6 +235,51 @@ function PaymentSettings({ userId }) {
                 onClick={() => setIsModalOpen(false)}
               >
                 Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {isEditModalOpen && selectedCard && (
+        <div className="add-card-modal-overlay">
+          <form className="add-card-modal-form" onSubmit={handleUpdateCard}>
+            <h3>Editar dados</h3>
+
+            <div className="form-group">
+              <label htmlFor="editVencimento">Data vencimento</label>
+              <input
+                type="text"
+                id="editVencimento"
+                placeholder="MM/AA"
+                value={editDataVencimento}
+                onChange={(e) => setEditDataVencimento(e.target.value)}
+                required
+                maxLength="5"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="editNome">Nome titular</label>
+              <input
+                type="text"
+                id="editNome"
+                value={editNomeTitular}
+                onChange={(e) => setEditNomeTitular(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-buttons">
+              <button type="submit" className="btn-avancar">
+                Avançar
+              </button>
+              <button
+                type="button"
+                className="btn-remover"
+                onClick={handleDeleteCard}
+              >
+                Remover
               </button>
             </div>
           </form>

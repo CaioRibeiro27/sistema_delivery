@@ -158,8 +158,20 @@
 }
 
 .btn-cancelar {
-  background-color: #f08080;
+  background-color: #dc3545;
   color: #222;
+}
+
+.btn-remover {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 12px;
+  flex: 1;
 }
 
 .add-payment-row {

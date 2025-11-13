@@ -110,7 +110,6 @@ app.get("/api/cards/:userId", (req, res) => {
     res.status(200).json({ success: true, cards: results });
   });
 });
-/*Adicionar cartão*/
 app.post("/api/cards", (req, res) => {
   const { numero_cartao, bandeira, nome_titular, data_vencimento, id_usuario } =
     req.body;
@@ -127,16 +126,63 @@ app.post("/api/cards", (req, res) => {
           .status(500)
           .json({ success: false, message: "Erro ao salvar cartão." });
       }
-      // Retorna o ID do novo cartão inserido
-      res
-        .status(201)
-        .json({
-          success: true,
-          message: "Cartão adicionado!",
-          cardId: result.insertId,
-        });
+      res.status(201).json({
+        success: true,
+        message: "Cartão adicionado!",
+        cardId: result.insertId,
+      });
     }
   );
+});
+
+/* Atualizar cartão */
+app.put("/api/cards/:cardId", (req, res) => {
+  const { cardId } = req.params;
+  const { nome_titular, data_vencimento } = req.body;
+
+  const sql =
+    "UPDATE cartao SET nome_titular = ?, data_vencimento = ? WHERE id_cartao = ?";
+
+  db.query(sql, [nome_titular, data_vencimento, cardId], (err, result) => {
+    if (err) {
+      console.error("Erro ao atualizar cartão:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro ao atualizar cartão." });
+    }
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Cartão não encontrado." });
+    }
+    res
+      .status(200)
+      .json({ success: true, message: "Cartão atualizado com sucesso!" });
+  });
+});
+
+/* Deleter cartão */
+app.delete("/api/cards/:cardId", (req, res) => {
+  const { cardId } = req.params;
+
+  const sql = "DELETE FROM cartao WHERE id_cartao = ?";
+
+  db.query(sql, [cardId], (err, result) => {
+    if (err) {
+      console.error("Erro ao deletar cartão:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro ao deletar cartão." });
+    }
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Cartão não encontrado." });
+    }
+    res
+      .status(200)
+      .json({ success: true, message: "Cartão removido com sucesso!" });
+  });
 });
 
 app.listen(port, () => {
