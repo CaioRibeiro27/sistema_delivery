@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
 import "./Sidebar.css";
+import { useNavigate } from "react-router-dom";
 import {
   FaUserCircle,
   FaBars,
   FaListAlt,
   FaCog,
   FaTicketAlt,
+  FaSignOutAlt,
 } from "react-icons/fa";
 
 function Sidebar({ isOpen, setIsOpen, onHistoryClick, onSettingsClick }) {
   const [user, setUser] = useState(null);
+  // Inicializar o hook
+  const navigate = useNavigate();
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -19,6 +24,14 @@ function Sidebar({ isOpen, setIsOpen, onHistoryClick, onSettingsClick }) {
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
+  };
+
+  // Função de logout
+  const handleLogout = () => {
+    // Apaga o crachá do usuário
+    localStorage.removeItem("user");
+    // Redireciona para a tela de login
+    navigate("/");
   };
 
   return (
@@ -40,6 +53,14 @@ function Sidebar({ isOpen, setIsOpen, onHistoryClick, onSettingsClick }) {
         </li>
         <li>
           <FaTicketAlt /> <span>Descontos</span>
+        </li>
+
+        {/* Botão de sair*/}
+        <li
+          onClick={handleLogout}
+          style={{ marginTop: "20px", borderTop: "1px solid #eee" }}
+        >
+          <FaSignOutAlt /> <span>Sair</span>
         </li>
       </ul>
 

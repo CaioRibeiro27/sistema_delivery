@@ -38,7 +38,8 @@ app.post("/api/register", async (req, res) => {
       if (err.code === "ER_DUP_ENTRY") {
         return res.status(400).json({
           success: false,
-          message: "Email, CPF ou Telefone já cadastrado.",
+          message:
+            "Não foi possível concluir o cadastro com os dados informados.",
         });
       }
       console.error(err);
