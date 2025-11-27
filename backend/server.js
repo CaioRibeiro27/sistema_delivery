@@ -186,6 +186,71 @@ app.delete("/api/cards/:cardId", (req, res) => {
   });
 });
 
+app.get("/api/users/:userId", (req, res) => {
+  const { userId } = req.params;
+  const sql =
+    "SELECT id_usuario, nome, email, telefone, cpf FROM usuario WHERE id_usuario = ?";
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) return res.status(500).json({ success: false });
+    if (results.length === 0) return res.status(404).json({ success: false });
+    res.status(200).json({ success: true, user: results[0] });
+  });
+});
+
+/* Atualiza telefone, email ou senha. */
+app.put("/api/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+  const { telefone, email, novaSenha } = req.body;
+
+  let sql = "";
+  let params = [];
+
+  if (telefone) {
+    sql = "UPDATE usuario SET telefone = ? WHERE id_usuario = ?";
+    params = [telefone, userId];
+  } else if (email) {
+    sql = "UPDATE usuario SET email = ? WHERE id_usuario = ?";
+    params = [email, userId];
+  } else if (novaSenha) {
+    const hashedPassword = await bcrypt.hash(novaSenha, 10);
+    sql = "UPDATE usuario SET senha = ? WHERE id_usuario = ?";
+    params = [hashedPassword, userId];
+  } else {
+    return res
+      .status(400)
+      .json({ success: false, message: "Nenhum dado para atualizar." });
+  }
+
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      console.error(err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro ao atualizar dados." });
+    }
+    res
+      .status(200)
+      .json({ success: true, message: "Dados atualizados com sucesso!" });
+  });
+});
+
+/* Rota para excluir conta*/
+app.delete("/api/users/:userId", (req, res) => {
+  const { userId } = req.params;
+  const sql = "DELETE FROM usuario WHERE id_usuario = ?";
+
+  db.query(sql, [userId], (err, result) => {
+    if (err)
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro ao excluir conta." });
+    res
+      .status(200)
+      .json({ success: true, message: "Conta excluída com sucesso." });
+  });
+});
+
 app.listen(port, () => {
   console.log(`🚀 Servidor backend rodando na porta ${port}`);
 });

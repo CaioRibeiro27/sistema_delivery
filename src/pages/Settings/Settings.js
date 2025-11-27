@@ -5,6 +5,7 @@ import { FaUserCircle, FaArrowLeft } from "react-icons/fa";
 
 import GeneralSettings from "../../components/GeneralSettings/GeneralSettings";
 import PaymentSettings from "../../components/PaymentSettings/PaymentSettings";
+import ProfileSettings from "../../components/ProfileSettings/ProfileSettings";
 
 function Settings() {
   const navigate = useNavigate();
@@ -35,7 +36,8 @@ function Settings() {
         return <PaymentSettings userId={user.id} />;
 
       case "perfil":
-        return <div>Em breve: Perfil</div>;
+        if (!user) return <div>Carregando...</div>;
+        return <ProfileSettings userId={user.id} />;
       default:
         return (
           <GeneralSettings
