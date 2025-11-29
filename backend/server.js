@@ -251,6 +251,126 @@ app.delete("/api/users/:userId", (req, res) => {
   });
 });
 
+// Buscar endereço
+app.get("/api/addresses/:userId", (req, res) => {
+  const { userId } = req.params;
+  const sql = `
+    SELECT e.id_endereco, e.rua, e.numero, e.cep, e.cidade, e.bairro, ue.localizacao 
+    FROM endereco e
+    JOIN usuario_endereco ue ON e.id_endereco = ue.id_endereco
+    WHERE ue.id_usuario = ?
+  `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err)
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro ao buscar endereços." });
+    res.status(200).json({ success: true, addresses: results });
+  });
+});
+
+//Adicionar endereço
+app.post("/api/addresses", (req, res) => {
+  const { rua, numero, cep, cidade, bairro, localizacao, id_usuario } =
+    req.body;
+
+  // 1. Inserir Endereço
+  const sqlAddress =
+    "INSERT INTO endereco (rua, numero, cep, cidade, bairro) VALUES (?, ?, ?, ?, ?)";
+
+  db.query(sqlAddress, [rua, numero, cep, cidade, bairro], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro ao salvar dados do endereço." });
+    }
+
+    const id_endereco = result.insertId; // Pegamos o ID do endereço recém-criado
+
+    // 2. Vincular ao Usuário
+    const sqlLink =
+      "INSERT INTO usuario_endereco (id_usuario, id_endereco, localizacao) VALUES (?, ?, ?)";
+
+    db.query(
+      sqlLink,
+      [id_usuario, id_endereco, localizacao],
+      (errLink, resultLink) => {
+        if (errLink) {
+          console.error(errLink);
+          return res
+            .status(500)
+            .json({ success: false, message: "Erro ao vincular endereço." });
+        }
+        res
+          .status(201)
+          .json({ success: true, message: "Endereço adicionado!" });
+      }
+    );
+  });
+});
+
+// Atualizar endereço
+app.put("/api/addresses/:addressId", (req, res) => {
+  const { addressId } = req.params;
+  const { rua, numero, cep, cidade, bairro, localizacao, id_usuario } =
+    req.body;
+
+  // Atualiza tabela endereco
+  const sqlAddress =
+    "UPDATE endereco SET rua=?, numero=?, cep=?, cidade=?, bairro=? WHERE id_endereco=?";
+
+  db.query(sqlAddress, [rua, numero, cep, cidade, bairro, addressId], (err) => {
+    if (err)
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro ao atualizar endereço." });
+
+    // Atualiza tabela de vinculo
+    const sqlLink =
+      "UPDATE usuario_endereco SET localizacao=? WHERE id_endereco=? AND id_usuario=?";
+    db.query(sqlLink, [localizacao, addressId, id_usuario], (errLink) => {
+      if (errLink) return res.status(500).json({ success: false });
+
+      res.status(200).json({ success: true, message: "Endereço atualizado!" });
+    });
+  });
+});
+
+//Deletar endereço
+app.delete("/api/addresses/:addressId", (req, res) => {
+  const { addressId } = req.params;
+  const sqlLink = "DELETE FROM usuario_endereco WHERE id_endereco = ?";
+
+  db.query(sqlLink, [addressId], (err, result) => {
+    if (err) {
+      console.error("Erro ao desvincular endereço:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro ao desvincular endereço." });
+    }
+
+    const sqlAddress = "DELETE FROM endereco WHERE id_endereco = ?";
+
+    db.query(sqlAddress, [addressId], (errAddress, resultAddress) => {
+      if (errAddress) {
+        console.error("Erro ao deletar endereço físico:", errAddress);
+        return res
+          .status(200)
+          .json({
+            success: true,
+            message: "Endereço desvinculado com sucesso.",
+          });
+      }
+
+      res
+        .status(200)
+        .json({ success: true, message: "Endereço removido completamente!" });
+    });
+  });
+});
+
 app.listen(port, () => {
   console.log(`🚀 Servidor backend rodando na porta ${port}`);
 });

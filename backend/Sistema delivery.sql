@@ -32,6 +32,8 @@ create table restaurante(
     nome varchar(50) NOT NULL,
     telefone varchar(20) NOT NULL UNIQUE,
     cnpj char(18) UNIQUE NOT NULL,
+    email varchar(100) UNIQUE NOT NULL,
+    senha varchar(50) NOT NULL,
     id_endereco int NOT NULL,
     
     FOREIGN KEY(id_endereco) REFERENCES endereco(id_endereco)

@@ -6,6 +6,7 @@ import { FaUserCircle, FaArrowLeft } from "react-icons/fa";
 import GeneralSettings from "../../components/GeneralSettings/GeneralSettings";
 import PaymentSettings from "../../components/PaymentSettings/PaymentSettings";
 import ProfileSettings from "../../components/ProfileSettings/ProfileSettings";
+import AddressSettings from "../../components/AddressSettings/AddressSettings";
 
 function Settings() {
   const navigate = useNavigate();
@@ -38,6 +39,11 @@ function Settings() {
       case "perfil":
         if (!user) return <div>Carregando...</div>;
         return <ProfileSettings userId={user.id} />;
+
+      case "enderecos":
+        if (!user) return <div>Carregando...</div>;
+        return <AddressSettings userId={user.id} />;
+
       default:
         return (
           <GeneralSettings
@@ -64,17 +70,26 @@ function Settings() {
           >
             Configurações gerais
           </li>
+
           <li
             className={activeTab === "pagamentos" ? "active" : ""}
             onClick={() => setActiveTab("pagamentos")}
           >
             Formas de pagamentos
           </li>
+
           <li
             className={activeTab === "perfil" ? "active" : ""}
             onClick={() => setActiveTab("perfil")}
           >
             Perfil
+          </li>
+
+          <li
+            className={activeTab === "enderecos" ? "active" : ""}
+            onClick={() => setActiveTab("enderecos")}
+          >
+            Gerenciar endereços
           </li>
         </ul>
         <div className="settings-back-arrow" onClick={() => navigate("/home")}>
