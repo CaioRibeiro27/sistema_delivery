@@ -5,8 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 function RestaurantSignup() {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1); // Controla qual tela aparece
-  // Estado único para TUDO
+  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     nome: "",
     email: "",

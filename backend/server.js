@@ -475,6 +475,69 @@ app.delete("/api/addresses/:addressId", (req, res) => {
   });
 });
 
+// ==========================================
+// Rotas de pedidos (Dashboard do restaurante)
+// ==========================================
+
+// Buscar pedidos de um restaurante específico
+app.get("/api/restaurant/:restaurantId/orders", (req, res) => {
+  const { restaurantId } = req.params;
+  const sql = `
+    SELECT 
+      p.id_pedido, 
+      p.valor_total, 
+      p.statusPedido, 
+      p.data_pedido,
+      u.nome as nome_cliente,
+      e.rua, e.numero, e.bairro -- Endereço do cliente
+    FROM pedido p
+    JOIN usuario u ON p.id_usuario = u.id_usuario
+    JOIN usuario_endereco ue ON u.id_usuario = ue.id_usuario -- Pega o endereço principal
+    JOIN endereco e ON ue.id_endereco = e.id_endereco
+    WHERE p.id_restaurante = ?
+    ORDER BY p.data_pedido DESC
+  `;
+
+  db.query(sql, [restaurantId], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro ao buscar pedidos." });
+    }
+    res.status(200).json({ success: true, orders: results });
+  });
+});
+
+// Atualizar status do pedido
+app.put("/api/orders/:orderId/status", (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+
+  const sql = "UPDATE pedido SET statusPedido = ? WHERE id_pedido = ?";
+
+  db.query(sql, [status, orderId], (err, result) => {
+    if (err) return res.status(500).json({ success: false });
+    res.status(200).json({ success: true, message: "Status atualizado!" });
+  });
+});
+
+// Buscar itens de um pedido específico
+app.get("/api/orders/:orderId/items", (req, res) => {
+  const { orderId } = req.params;
+  const sql = `
+    SELECT pi.quantidade, c.nome_produto, pi.preco_unitario
+    FROM pedido_itens pi
+    JOIN cardapio c ON pi.id_cardapio = c.id_cardapio
+    WHERE pi.id_pedido = ?
+  `;
+
+  db.query(sql, [orderId], (err, results) => {
+    if (err) return res.status(500).json({ success: false });
+    res.status(200).json({ success: true, items: results });
+  });
+});
+
 app.listen(port, () => {
   console.log(`🚀 Servidor backend rodando na porta ${port}`);
 });
