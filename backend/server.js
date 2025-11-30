@@ -9,6 +9,7 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
+// --- CONEXÃO COM O BANCO ---
 const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -25,9 +26,13 @@ db.getConnection((err, connection) => {
   connection.release();
 });
 
+// ==========================================
+// ROTAS DE AUTENTICAÇÃO (LOGIN & REGISTER)
+// ==========================================
+
+// Rota de Cadastro de USUÁRIO
 app.post("/api/register", async (req, res) => {
   const { nome, telefone, senha, email, cpf } = req.body;
-
   const hashedPassword = await bcrypt.hash(senha, 10);
 
   const sql =
@@ -47,54 +52,139 @@ app.post("/api/register", async (req, res) => {
         .status(500)
         .json({ success: false, message: "Erro ao registrar usuário." });
     }
-
     res
       .status(201)
       .json({ success: true, message: "Usuário registrado com sucesso!" });
   });
 });
 
+// Rota de Cadastro de RESTAURANTE
+app.post("/api/register-restaurant", async (req, res) => {
+  const {
+    nome,
+    email,
+    senha,
+    telefone,
+    cnpj, // Dados do restaurante
+    estado,
+    cidade,
+    cep,
+    bairro,
+    rua,
+    numero, // Dados do endereço
+  } = req.body;
+
+  const hashedPassword = await bcrypt.hash(senha, 10);
+
+  // Inserir Endereço do Restaurante
+  const sqlAddress =
+    "INSERT INTO endereco (rua, numero, cep, cidade, bairro) VALUES (?, ?, ?, ?, ?)";
+
+  db.query(
+    sqlAddress,
+    [rua, numero, cep, cidade, bairro],
+    (err, resultAddr) => {
+      if (err)
+        return res
+          .status(500)
+          .json({ success: false, message: "Erro ao salvar endereço." });
+
+      const id_endereco = resultAddr.insertId;
+      const sqlRest =
+        "INSERT INTO restaurante (nome, telefone, cnpj, id_endereco, email, senha) VALUES (?, ?, ?, ?, ?, ?)";
+
+      db.query(
+        sqlRest,
+        [nome, telefone, cnpj, id_endereco, email, hashedPassword],
+        (errRest, resultRest) => {
+          if (errRest) {
+            if (errRest.code === "ER_DUP_ENTRY") {
+              return res.status(400).json({
+                success: false,
+                message: "Restaurante já cadastrado.",
+              });
+            }
+            console.error(errRest);
+            return res
+              .status(500)
+              .json({ success: false, message: "Erro ao salvar restaurante." });
+          }
+          res
+            .status(201)
+            .json({ success: true, message: "Restaurante cadastrado!" });
+        }
+      );
+    }
+  );
+});
+
+// Rota de login unificada
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
-  const sql = "SELECT * FROM usuario WHERE email = ?";
+  const sqlUser = "SELECT * FROM usuario WHERE email = ?";
 
-  db.query(sql, [email], async (err, results) => {
-    if (err) {
-      console.error(err);
+  db.query(sqlUser, [email], async (err, resultsUser) => {
+    if (err)
       return res
         .status(500)
         .json({ success: false, message: "Erro no servidor." });
+
+    if (resultsUser.length > 0) {
+      const user = resultsUser[0];
+      const isMatch = await bcrypt.compare(password, user.senha);
+
+      if (isMatch) {
+        return res.status(200).json({
+          success: true,
+          message: "Login bem-sucedido!",
+          type: "usuario", // Identificador
+          user: { id: user.id_usuario, nome: user.nome, email: user.email },
+        });
+      } else {
+        return res
+          .status(401)
+          .json({ success: false, message: "Email ou senha inválidos." });
+      }
     }
 
-    if (results.length === 0) {
+    const sqlRest = "SELECT * FROM restaurante WHERE email = ?";
+
+    db.query(sqlRest, [email], async (errRest, resultsRest) => {
+      if (errRest)
+        return res
+          .status(500)
+          .json({ success: false, message: "Erro no servidor." });
+
+      if (resultsRest.length > 0) {
+        const rest = resultsRest[0];
+        const isMatch = await bcrypt.compare(password, rest.senha);
+
+        if (isMatch) {
+          return res.status(200).json({
+            success: true,
+            message: "Login bem-sucedido!",
+            type: "restaurante", // Identificador
+            user: {
+              id: rest.id_restaurante,
+              nome: rest.nome,
+              email: rest.email,
+            },
+          });
+        }
+      }
+
       return res
         .status(401)
         .json({ success: false, message: "Email ou senha inválidos." });
-    }
-
-    const user = results[0];
-    const isMatch = await bcrypt.compare(password, user.senha);
-
-    if (isMatch) {
-      res.status(200).json({
-        success: true,
-        message: "Login bem-sucedido!",
-        user: {
-          id: user.id_usuario,
-          nome: user.nome,
-          email: user.email,
-        },
-      });
-    } else {
-      res
-        .status(401)
-        .json({ success: false, message: "Email ou senha inválidos." });
-    }
+    });
   });
 });
 
-/*Rota cartão*/
-/*Buscar cartão*/
+// ==========================================
+// ROTAS DE CARTÕES (CRUD)
+// ==========================================
+
+// Buscar cartões
 app.get("/api/cards/:userId", (req, res) => {
   const { userId } = req.params;
   const sql =
@@ -107,10 +197,11 @@ app.get("/api/cards/:userId", (req, res) => {
         .status(500)
         .json({ success: false, message: "Erro no servidor." });
     }
-
     res.status(200).json({ success: true, cards: results });
   });
 });
+
+// Adicionar cartão
 app.post("/api/cards", (req, res) => {
   const { numero_cartao, bandeira, nome_titular, data_vencimento, id_usuario } =
     req.body;
@@ -122,6 +213,12 @@ app.post("/api/cards", (req, res) => {
     [numero_cartao, bandeira, nome_titular, data_vencimento, id_usuario],
     (err, result) => {
       if (err) {
+        if (err.code === "ER_DUP_ENTRY") {
+          return res.status(400).json({
+            success: false,
+            message: "Este número de cartão já está cadastrado.",
+          });
+        }
         console.error("Erro ao salvar cartão:", err);
         return res
           .status(500)
@@ -136,11 +233,10 @@ app.post("/api/cards", (req, res) => {
   );
 });
 
-/* Atualizar cartão */
+// Atualizar cartão
 app.put("/api/cards/:cardId", (req, res) => {
   const { cardId } = req.params;
   const { nome_titular, data_vencimento } = req.body;
-
   const sql =
     "UPDATE cartao SET nome_titular = ?, data_vencimento = ? WHERE id_cartao = ?";
 
@@ -162,10 +258,9 @@ app.put("/api/cards/:cardId", (req, res) => {
   });
 });
 
-/* Deleter cartão */
+// Deletar cartão
 app.delete("/api/cards/:cardId", (req, res) => {
   const { cardId } = req.params;
-
   const sql = "DELETE FROM cartao WHERE id_cartao = ?";
 
   db.query(sql, [cardId], (err, result) => {
@@ -186,6 +281,11 @@ app.delete("/api/cards/:cardId", (req, res) => {
   });
 });
 
+// ==========================================
+// ROTAS DE USUÁRIO (PERFIL)
+// ==========================================
+
+// Buscar dados do perfil
 app.get("/api/users/:userId", (req, res) => {
   const { userId } = req.params;
   const sql =
@@ -198,7 +298,7 @@ app.get("/api/users/:userId", (req, res) => {
   });
 });
 
-/* Atualiza telefone, email ou senha. */
+// Atualizar perfil (telefone, email ou senha)
 app.put("/api/users/:userId", async (req, res) => {
   const { userId } = req.params;
   const { telefone, email, novaSenha } = req.body;
@@ -235,7 +335,7 @@ app.put("/api/users/:userId", async (req, res) => {
   });
 });
 
-/* Rota para excluir conta*/
+// Deletar conta de usuário
 app.delete("/api/users/:userId", (req, res) => {
   const { userId } = req.params;
   const sql = "DELETE FROM usuario WHERE id_usuario = ?";
@@ -251,7 +351,11 @@ app.delete("/api/users/:userId", (req, res) => {
   });
 });
 
-// Buscar endereço
+// ==========================================
+// ROTAS DE ENDEREÇO (CRUD)
+// ==========================================
+
+// Buscar endereços do usuário
 app.get("/api/addresses/:userId", (req, res) => {
   const { userId } = req.params;
   const sql = `
@@ -270,7 +374,7 @@ app.get("/api/addresses/:userId", (req, res) => {
   });
 });
 
-//Adicionar endereço
+// Adicionar endereço
 app.post("/api/addresses", (req, res) => {
   const { rua, numero, cep, cidade, bairro, localizacao, id_usuario } =
     req.body;
@@ -287,7 +391,7 @@ app.post("/api/addresses", (req, res) => {
         .json({ success: false, message: "Erro ao salvar dados do endereço." });
     }
 
-    const id_endereco = result.insertId; // Pegamos o ID do endereço recém-criado
+    const id_endereco = result.insertId;
 
     // 2. Vincular ao Usuário
     const sqlLink =
@@ -332,15 +436,16 @@ app.put("/api/addresses/:addressId", (req, res) => {
       "UPDATE usuario_endereco SET localizacao=? WHERE id_endereco=? AND id_usuario=?";
     db.query(sqlLink, [localizacao, addressId, id_usuario], (errLink) => {
       if (errLink) return res.status(500).json({ success: false });
-
       res.status(200).json({ success: true, message: "Endereço atualizado!" });
     });
   });
 });
 
-//Deletar endereço
+// Deletar endereço
 app.delete("/api/addresses/:addressId", (req, res) => {
   const { addressId } = req.params;
+
+  // 1. Deletar Vínculo
   const sqlLink = "DELETE FROM usuario_endereco WHERE id_endereco = ?";
 
   db.query(sqlLink, [addressId], (err, result) => {
@@ -351,17 +456,16 @@ app.delete("/api/addresses/:addressId", (req, res) => {
         .json({ success: false, message: "Erro ao desvincular endereço." });
     }
 
+    // 2. Deletar Endereço Físico
     const sqlAddress = "DELETE FROM endereco WHERE id_endereco = ?";
 
     db.query(sqlAddress, [addressId], (errAddress, resultAddress) => {
       if (errAddress) {
         console.error("Erro ao deletar endereço físico:", errAddress);
-        return res
-          .status(200)
-          .json({
-            success: true,
-            message: "Endereço desvinculado com sucesso.",
-          });
+        return res.status(200).json({
+          success: true,
+          message: "Endereço desvinculado com sucesso.",
+        });
       }
 
       res

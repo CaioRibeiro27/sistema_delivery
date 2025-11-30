@@ -6,6 +6,8 @@ import Login from "./pages/Login/Login";
 import Signup from "./pages/Signup/Signup";
 import Home from "./pages/Home/Home";
 import Settings from "./pages/Settings/Settings";
+import Selection from "./pages/Selection/Selection";
+import RestaurantSignup from "./pages/RestaurantSignup/RestaurantSignup";
 
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
@@ -15,8 +17,9 @@ function App() {
       <Routes>
         {/*Rotas Públicas*/}
         <Route path="/" element={<Login />} />
-        <Route path="/cadastro" element={<Signup />} />
-
+        <Route path="/selecao" element={<Selection />} />
+        <Route path="/cadastro" element={<Signup />} /> {/* Cadastro Usuário */}
+        <Route path="/cadastro-restaurante" element={<RestaurantSignup />} />
         {/*Rotas Protegidas*/}
         <Route
           path="/home"
@@ -26,7 +29,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/configuracoes"
           element={

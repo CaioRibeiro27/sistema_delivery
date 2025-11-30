@@ -23,8 +23,17 @@ function Login() {
       const data = await response.json();
 
       if (data.success) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        navigate("/home");
+        // Salva o usuário E o tipo dele
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...data.user, type: data.type })
+        );
+
+        if (data.type === "usuario") {
+          navigate("/home");
+        } else if (data.type === "restaurante") {
+          navigate("/dashboard-restaurante");
+        }
       } else {
         alert("Falha no login: " + data.message);
       }
@@ -59,7 +68,7 @@ function Login() {
       <div className="separator">ou</div>
       <SocialLogin />
       <p className="signup-link">
-        Não possui conta? Faça seu <Link to="/cadastro">cadastro</Link>
+        Não possui conta? Faça seu <Link to="/selecao">cadastro</Link>
       </p>
     </div>
   );
