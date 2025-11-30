@@ -10,6 +10,7 @@ import Selection from "./pages/Selection/Selection";
 import RestaurantSignup from "./pages/RestaurantSignup/RestaurantSignup";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import RestaurantDashboard from "./pages/RestaurantDashboard/RestaurantDashboard";
+import RestaurantMenu from "./pages/RestaurantMenu/RestaurantMenu";
 
 function App() {
   return (
@@ -43,6 +44,15 @@ function App() {
           element={
             <ProtectedRoute>
               <RestaurantDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/cardapio-restaurante"
+          element={
+            <ProtectedRoute>
+              <RestaurantMenu />
             </ProtectedRoute>
           }
         />

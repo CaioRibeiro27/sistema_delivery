@@ -538,6 +538,44 @@ app.get("/api/orders/:orderId/items", (req, res) => {
   });
 });
 
+app.get("/api/menu/:restaurantId", (req, res) => {
+  const { restaurantId } = req.params;
+  const sql = "SELECT * FROM cardapio WHERE id_restaurante = ?";
+
+  db.query(sql, [restaurantId], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro ao buscar cardápio." });
+    }
+    res.status(200).json({ success: true, items: results });
+  });
+});
+
+// Adicionar item ao cardápio
+app.post("/api/menu", (req, res) => {
+  const { nome_produto, descricao, preco, categoria, id_restaurante } =
+    req.body;
+
+  const sql =
+    "INSERT INTO cardapio (nome_produto, descricao, preco, categoria, id_restaurante) VALUES (?, ?, ?, ?, ?)";
+
+  db.query(
+    sql,
+    [nome_produto, descricao, preco, categoria, id_restaurante],
+    (err, result) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .json({ success: false, message: "Erro ao adicionar item." });
+      }
+      res.status(201).json({ success: true, message: "Item adicionado!" });
+    }
+  );
+});
+
 app.listen(port, () => {
   console.log(`🚀 Servidor backend rodando na porta ${port}`);
 });

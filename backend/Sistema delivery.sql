@@ -44,6 +44,7 @@ create table cardapio(
     nome_produto varchar(50) NOT NULL,
     descricao varchar(100) NOT NULL,
     preco decimal(6, 2) NOT NULL,
+    categoria ENUM('Refeicoes', 'Bebidas', 'Aperitivos') NOT NULL DEFAULT 'Refeicoes',
     id_restaurante int NOT NULL,
     
     FOREIGN KEY(id_restaurante) REFERENCES restaurante(id_restaurante)

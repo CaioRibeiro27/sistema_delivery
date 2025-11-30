@@ -8,11 +8,11 @@ import {
   FaCog,
   FaTicketAlt,
   FaSignOutAlt,
+  FaBookOpen,
 } from "react-icons/fa";
 
 function Sidebar({ isOpen, setIsOpen, onHistoryClick, onSettingsClick }) {
   const [user, setUser] = useState(null);
-  // Inicializar o hook
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,11 +26,8 @@ function Sidebar({ isOpen, setIsOpen, onHistoryClick, onSettingsClick }) {
     setIsOpen(!isOpen);
   };
 
-  // Função de logout
   const handleLogout = () => {
-    // Apaga o crachá do usuário
     localStorage.removeItem("user");
-    // Redireciona para a tela de login
     navigate("/");
   };
 
@@ -48,14 +45,19 @@ function Sidebar({ isOpen, setIsOpen, onHistoryClick, onSettingsClick }) {
         <li onClick={onHistoryClick}>
           <FaListAlt /> <span>Histórico de pedidos</span>
         </li>
+
         <li onClick={onSettingsClick}>
           <FaCog /> <span>Configurações</span>
         </li>
+        {user && user.type === "restaurante" && (
+          <li onClick={() => navigate("/cardapio-restaurante")}>
+            <FaBookOpen /> <span>Cardápio</span>
+          </li>
+        )}
         <li>
           <FaTicketAlt /> <span>Descontos</span>
         </li>
 
-        {/* Botão de sair*/}
         <li
           onClick={handleLogout}
           style={{ marginTop: "20px", borderTop: "1px solid #eee" }}
