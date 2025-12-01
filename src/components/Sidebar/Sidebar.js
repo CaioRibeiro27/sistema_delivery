@@ -11,7 +11,7 @@ import {
   FaBookOpen,
 } from "react-icons/fa";
 
-function Sidebar({ isOpen, setIsOpen, onHistoryClick, onSettingsClick }) {
+function Sidebar({ isOpen, setIsOpen, onHistoryClick }) {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
@@ -31,6 +31,14 @@ function Sidebar({ isOpen, setIsOpen, onHistoryClick, onSettingsClick }) {
     navigate("/");
   };
 
+  const handleSettingsClick = () => {
+    if (user && user.type === "restaurante") {
+      navigate("/configuracoes-restaurante");
+    } else {
+      navigate("/configuracoes");
+    }
+  };
+
   return (
     <div className={`sidebar ${isOpen ? "open" : ""}`}>
       <div className="sidebar-header">
@@ -46,18 +54,23 @@ function Sidebar({ isOpen, setIsOpen, onHistoryClick, onSettingsClick }) {
           <FaListAlt /> <span>Histórico de pedidos</span>
         </li>
 
-        <li onClick={onSettingsClick}>
+        <li onClick={handleSettingsClick}>
           <FaCog /> <span>Configurações</span>
         </li>
+
+        {/* Cardápio (Apenas para Restaurante) */}
         {user && user.type === "restaurante" && (
           <li onClick={() => navigate("/cardapio-restaurante")}>
             <FaBookOpen /> <span>Cardápio</span>
           </li>
         )}
+
+        {/* Descontos (Para todos) */}
         <li>
           <FaTicketAlt /> <span>Descontos</span>
         </li>
 
+        {/* Botão de Sair */}
         <li
           onClick={handleLogout}
           style={{ marginTop: "20px", borderTop: "1px solid #eee" }}

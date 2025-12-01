@@ -576,6 +576,92 @@ app.post("/api/menu", (req, res) => {
   );
 });
 
+app.get("/api/restaurants/:id", (req, res) => {
+  const { id } = req.params;
+  const sql =
+    "SELECT id_restaurante, nome, email, telefone, cnpj FROM restaurante WHERE id_restaurante = ?";
+  db.query(sql, [id], (err, results) => {
+    if (err) return res.status(500).json({ success: false });
+    res.status(200).json({ success: true, user: results[0] });
+  });
+});
+
+// Atualizar Perfil do Restaurante
+app.put("/api/restaurants/:id", async (req, res) => {
+  const { id } = req.params;
+  const { nome, telefone, novaSenha } = req.body;
+
+  let sql = "";
+  let params = [];
+
+  if (nome) {
+    sql = "UPDATE restaurante SET nome = ? WHERE id_restaurante = ?";
+    params = [nome, id];
+  } else if (telefone) {
+    sql = "UPDATE restaurante SET telefone = ? WHERE id_restaurante = ?";
+    params = [telefone, id];
+  } else if (novaSenha) {
+    const hashedPassword = await bcrypt.hash(novaSenha, 10);
+    sql = "UPDATE restaurante SET senha = ? WHERE id_restaurante = ?";
+    params = [hashedPassword, id];
+  } else {
+    return res.status(400).json({ success: false });
+  }
+
+  db.query(sql, params, (err) => {
+    if (err)
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro ao atualizar." });
+    res.status(200).json({ success: true, message: "Atualizado!" });
+  });
+});
+
+// Buscar Endereço do Restaurante
+app.get("/api/restaurants/:id/address", (req, res) => {
+  const { id } = req.params;
+  const sql = `
+    SELECT e.* FROM endereco e
+    JOIN restaurante r ON r.id_endereco = e.id_endereco
+    WHERE r.id_restaurante = ?
+  `;
+  db.query(sql, [id], (err, results) => {
+    if (err) return res.status(500).json({ success: false });
+    res.status(200).json({ success: true, address: results[0] });
+  });
+});
+
+// Atualizar Endereço do Restaurante
+app.put("/api/restaurants/:id/address", (req, res) => {
+  const { id } = req.params;
+  const { rua, numero, cep, bairro, cidade } = req.body;
+  const sqlFind =
+    "SELECT id_endereco FROM restaurante WHERE id_restaurante = ?";
+
+  db.query(sqlFind, [id], (err, result) => {
+    if (err || result.length === 0)
+      return res.status(500).json({ success: false });
+
+    const id_endereco = result[0].id_endereco;
+    const sqlUpdate =
+      "UPDATE endereco SET rua=?, numero=?, cep=?, bairro=?, cidade=? WHERE id_endereco=?";
+
+    db.query(
+      sqlUpdate,
+      [rua, numero, cep, bairro, cidade, id_endereco],
+      (errUp) => {
+        if (errUp)
+          return res
+            .status(500)
+            .json({ success: false, message: "Erro ao atualizar endereço." });
+        res
+          .status(200)
+          .json({ success: true, message: "Endereço atualizado!" });
+      }
+    );
+  });
+});
+
 app.listen(port, () => {
   console.log(`🚀 Servidor backend rodando na porta ${port}`);
 });

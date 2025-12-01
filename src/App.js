@@ -2,26 +2,35 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
 
+// Componentes de Segurança
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+
+// Páginas Públicas
 import Login from "./pages/Login/Login";
-import Signup from "./pages/Signup/Signup";
+import Selection from "./pages/Selection/Selection";
+import Signup from "./pages/Signup/Signup"; // Cadastro Usuário
+import RestaurantSignup from "./pages/RestaurantSignup/RestaurantSignup";
+
+// Páginas do USUÁRIO
 import Home from "./pages/Home/Home";
 import Settings from "./pages/Settings/Settings";
-import Selection from "./pages/Selection/Selection";
-import RestaurantSignup from "./pages/RestaurantSignup/RestaurantSignup";
-import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+
+// Páginas do RESTAURANTE
 import RestaurantDashboard from "./pages/RestaurantDashboard/RestaurantDashboard";
 import RestaurantMenu from "./pages/RestaurantMenu/RestaurantMenu";
+import RestaurantSettings from "./pages/RestaurantSettings/RestaurantSettings";
 
 function App() {
   return (
     <div className="App">
       <Routes>
-        {/*Rotas Públicas*/}
+        {/* ROTAS PÚBLICAS */}
         <Route path="/" element={<Login />} />
         <Route path="/selecao" element={<Selection />} />
         <Route path="/cadastro" element={<Signup />} />
         <Route path="/cadastro-restaurante" element={<RestaurantSignup />} />
-        {/*Rotas Protegidas*/}
+
+        {/* ROTAS PROTEGIDAS (USUÁRIO) */}
         <Route
           path="/home"
           element={
@@ -39,6 +48,7 @@ function App() {
           }
         />
 
+        {/* ROTAS PROTEGIDAS (RESTAURANTE) */}
         <Route
           path="/dashboard-restaurante"
           element={
@@ -47,12 +57,19 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/cardapio-restaurante"
           element={
             <ProtectedRoute>
               <RestaurantMenu />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/configuracoes-restaurante"
+          element={
+            <ProtectedRoute>
+              <RestaurantSettings />
             </ProtectedRoute>
           }
         />
