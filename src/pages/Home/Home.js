@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import "./Home.css";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { FaSearch, FaStore, FaUtensils } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [user, setUser] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const navigate = useNavigate();
 
   // Estados de Dados
   const [restaurants, setRestaurants] = useState([]);
@@ -22,7 +24,7 @@ function Home() {
   }, []);
 
   const fetchData = async (userId) => {
-    // Busca Restaurantes
+    // 1. Busca Restaurantes
     try {
       const resRest = await fetch("http://localhost:3001/api/restaurants");
       const dataRest = await resRest.json();
@@ -77,17 +79,23 @@ function Home() {
               <h3>Restaurantes próximos</h3>
               <div className="restaurants-scroll">
                 {filteredRestaurants.map((rest) => (
-                  <div key={rest.id_restaurante} className="restaurant-card">
+                  <div
+                    key={rest.id_restaurante}
+                    className="restaurant-card"
+                    onClick={() =>
+                      navigate(`/restaurante/${rest.id_restaurante}`)
+                    }
+                  >
                     <div className="rest-icon">
                       <FaUtensils />
                     </div>
                     <div className="rest-info">
                       <strong>{rest.nome}</strong>
-                      {/* Distância simulada, já que não temos GPS real ainda */}
                       <span>{(Math.random() * 5 + 1).toFixed(1)} KM</span>
                     </div>
                   </div>
                 ))}
+
                 {filteredRestaurants.length === 0 && (
                   <p>Nenhum restaurante encontrado.</p>
                 )}
