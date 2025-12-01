@@ -9,7 +9,6 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [telefone, setTelefone] = useState("");
-  const [cpf, setCpf] = useState("");
 
   const navigate = useNavigate();
 
@@ -21,7 +20,6 @@ function Signup() {
       telefone: telefone,
       senha: password,
       email: email,
-      cpf: cpf,
     };
 
     try {
@@ -80,19 +78,12 @@ function Signup() {
           value={telefone}
           onChange={(e) => setTelefone(e.target.value)}
         />{" "}
-        <InputGroup
-          label="CPF"
-          type="text"
-          id="cpf"
-          value={cpf}
-          onChange={(e) => setCpf(e.target.value)}
-        />{" "}
         <button type="submit" className="signup-button">
           Cadastrar
         </button>{" "}
       </form>
       <div className="separator">ou</div>
-      <SocialLogin /> {" "}
+      <SocialLogin mode="signup" />
       <p className="login-link">
         Já possui conta? Fazer <Link to="/">login</Link> {" "}
       </p>

@@ -13,8 +13,7 @@ create table usuario(
     nome varchar(100) NOT NULL,
     telefone varchar(20) NOT NULL UNIQUE,
     senha varchar(50) NOT NULL,
-    email varchar(100) UNIQUE NOT NULL,
-    cpf char(14) UNIQUE NOT NULL
+    email varchar(100) UNIQUE NOT NULL
 );
 
 create table usuario_endereco(

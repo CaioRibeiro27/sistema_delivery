@@ -66,7 +66,9 @@ function Login() {
         </button>
       </form>
       <div className="separator">ou</div>
-      <SocialLogin />
+
+      <SocialLogin mode="login" />
+
       <p className="signup-link">
         Não possui conta? Faça seu <Link to="/selecao">cadastro</Link>
       </p>
