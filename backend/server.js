@@ -662,6 +662,55 @@ app.put("/api/restaurants/:id/address", (req, res) => {
   });
 });
 
+app.get("/api/restaurants", (req, res) => {
+  const sql = "SELECT id_restaurante, nome, telefone FROM restaurante";
+
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ success: false });
+    res.status(200).json({ success: true, restaurants: results });
+  });
+});
+
+// Buscar o último pedido ATIVO do usuário
+app.get("/api/users/:userId/active-order", (req, res) => {
+  const { userId } = req.params;
+
+  const sql = `
+    SELECT p.id_pedido, p.statusPedido, r.nome as nome_restaurante
+    FROM pedido p
+    JOIN restaurante r ON p.id_restaurante = r.id_restaurante
+    WHERE p.id_usuario = ? 
+    AND p.statusPedido NOT IN ('Entregue', 'Cancelado')
+    ORDER BY p.data_pedido DESC
+    LIMIT 1
+  `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) return res.status(500).json({ success: false });
+
+    if (results.length > 0) {
+      const order = results[0];
+      const sqlItems = `
+        SELECT pi.quantidade, c.nome_produto 
+        FROM pedido_itens pi
+        JOIN cardapio c ON pi.id_cardapio = c.id_cardapio
+        WHERE pi.id_pedido = ?
+      `;
+
+      db.query(sqlItems, [order.id_pedido], (errItems, items) => {
+        if (errItems) return res.status(500).json({ success: false });
+
+        res.status(200).json({
+          success: true,
+          activeOrder: { ...order, items: items },
+        });
+      });
+    } else {
+      res.status(200).json({ success: true, activeOrder: null });
+    }
+  });
+});
+
 app.listen(port, () => {
   console.log(`🚀 Servidor backend rodando na porta ${port}`);
 });
