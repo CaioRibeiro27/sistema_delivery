@@ -17,7 +17,9 @@ function PaymentSettings({ userId }) {
   const fetchCards = async () => {
     if (!userId) return;
     try {
-      const response = await fetch(`http://localhost:3001/api/cards/${userId}`);
+      const response = await fetch(
+        `http://localhost:3001/api/user/cards/${userId}`
+      );
       const data = await response.json();
       if (data.success) {
         setCards(data.cards);
@@ -33,6 +35,12 @@ function PaymentSettings({ userId }) {
 
   const handleAddCard = async (e) => {
     e.preventDefault();
+    if (!userId) {
+      alert(
+        "Erro: ID do usuário não encontrada. Por favor, saia e entre na página de configurações novamente."
+      );
+      return;
+    }
 
     const cardData = {
       numero_cartao: numeroCartao,
@@ -43,7 +51,7 @@ function PaymentSettings({ userId }) {
     };
 
     try {
-      const response = await fetch("http://localhost:3001/api/cards", {
+      const response = await fetch("http://localhost:3001/api/user/cards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(cardData),
@@ -69,7 +77,6 @@ function PaymentSettings({ userId }) {
   const openEditModal = (card, e) => {
     e.preventDefault();
     e.stopPropagation();
-
     setSelectedCard(card);
     setEditNomeTitular(card.nome_titular);
     setEditDataVencimento(card.data_vencimento);
@@ -82,7 +89,7 @@ function PaymentSettings({ userId }) {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/api/cards/${selectedCard.id_cartao}`,
+        `http://localhost:3001/api/user/cards/${selectedCard.id_cartao}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -111,10 +118,8 @@ function PaymentSettings({ userId }) {
     if (window.confirm("Tem certeza que deseja remover este cartão?")) {
       try {
         const response = await fetch(
-          `http://localhost:3001/api/cards/${selectedCard.id_cartao}`,
-          {
-            method: "DELETE",
-          }
+          `http://localhost:3001/api/user/cards/${selectedCard.id_cartao}`,
+          { method: "DELETE" }
         );
         const data = await response.json();
         if (data.success) {
@@ -141,7 +146,6 @@ function PaymentSettings({ userId }) {
             <div className="card-icon">
               <FaCreditCard size={28} />
             </div>
-
             <div className="card-details">
               <strong>{card.bandeira}</strong>
               <span>
@@ -149,7 +153,6 @@ function PaymentSettings({ userId }) {
                 {card.numero_cartao.slice(-4)}
               </span>
             </div>
-
             <a
               href="#"
               className="card-edit-link"
@@ -168,7 +171,6 @@ function PaymentSettings({ userId }) {
         <div className="card-icon">
           <FaPlus size={24} />
         </div>
-
         <div className="card-details"></div>
 
         <a
@@ -188,7 +190,6 @@ function PaymentSettings({ userId }) {
         <div className="add-card-modal-overlay">
           <form className="add-card-modal-form" onSubmit={handleAddCard}>
             <h3>Adicionar pagamento</h3>
-
             <div className="form-group">
               <label htmlFor="vencimento">Data vencimento</label>
               <input
@@ -201,7 +202,6 @@ function PaymentSettings({ userId }) {
                 maxLength="5"
               />
             </div>
-
             <div className="form-group">
               <label htmlFor="nome">Nome titular</label>
               <input
@@ -224,7 +224,6 @@ function PaymentSettings({ userId }) {
                 maxLength="16"
               />
             </div>
-
             <div className="form-buttons">
               <button type="submit" className="btn-avancar">
                 Avançar
@@ -245,7 +244,6 @@ function PaymentSettings({ userId }) {
         <div className="add-card-modal-overlay">
           <form className="add-card-modal-form" onSubmit={handleUpdateCard}>
             <h3>Editar dados</h3>
-
             <div className="form-group">
               <label htmlFor="editVencimento">Data vencimento</label>
               <input
@@ -258,7 +256,6 @@ function PaymentSettings({ userId }) {
                 maxLength="5"
               />
             </div>
-
             <div className="form-group">
               <label htmlFor="editNome">Nome titular</label>
               <input
@@ -269,7 +266,6 @@ function PaymentSettings({ userId }) {
                 required
               />
             </div>
-
             <div className="form-buttons">
               <button type="submit" className="btn-avancar">
                 Avançar

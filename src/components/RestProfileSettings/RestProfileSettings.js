@@ -10,7 +10,7 @@ function RestProfileSettings({ restaurantId }) {
   const fetchData = async () => {
     try {
       const res = await fetch(
-        `http://localhost:3001/api/restaurants/${restaurantId}`
+        `http://localhost:3001/api/restaurant/${restaurantId}`
       );
       const json = await res.json();
       if (json.success) setData(json.user);
@@ -32,7 +32,7 @@ function RestProfileSettings({ restaurantId }) {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/api/restaurants/${restaurantId}`,
+        `http://localhost:3001/api/restaurant/${restaurantId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

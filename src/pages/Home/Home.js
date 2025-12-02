@@ -26,7 +26,7 @@ function Home() {
   const fetchData = async (userId) => {
     // Busca Restaurantes
     try {
-      const resRest = await fetch("http://localhost:3001/api/restaurants");
+      const resRest = await fetch("http://localhost:3001/api/restaurant/all");
       const dataRest = await resRest.json();
       if (dataRest.success) setRestaurants(dataRest.restaurants);
     } catch (e) {
@@ -36,7 +36,7 @@ function Home() {
     // Busca Pedido Ativo
     try {
       const resOrder = await fetch(
-        `http://localhost:3001/api/users/${userId}/active-order`
+        `http://localhost:3001/api/user/${userId}/active-order`
       );
       const dataOrder = await resOrder.json();
       if (dataOrder.success) setActiveOrder(dataOrder.activeOrder);

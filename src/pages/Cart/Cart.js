@@ -26,7 +26,9 @@ function Cart() {
 
   const fetchAddresses = async (userId) => {
     try {
-      const res = await fetch(`http://localhost:3001/api/addresses/${userId}`);
+      const res = await fetch(
+        `http://localhost:3001/api/user/addresses/${userId}`
+      );
       const data = await res.json();
       if (data.success && data.addresses.length > 0) {
         setAddresses(data.addresses);

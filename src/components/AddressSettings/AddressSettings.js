@@ -22,7 +22,7 @@ function AddressSettings({ userId }) {
   const fetchAddresses = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3001/api/addresses/${userId}`
+        `http://localhost:3001/api/user/addresses/${userId}`
       );
       const data = await response.json();
       if (data.success) setAddresses(data.addresses);
@@ -35,7 +35,6 @@ function AddressSettings({ userId }) {
     fetchAddresses();
   }, [userId]);
 
-  // Abrir modal para ADICIONAR
   const openAddModal = () => {
     setIsEditMode(false);
     setCidade("");
@@ -47,7 +46,6 @@ function AddressSettings({ userId }) {
     setIsModalOpen(true);
   };
 
-  // Abrir modal para EDITAR
   const openEditModal = (addr) => {
     setIsEditMode(true);
     setSelectedAddressId(addr.id_endereco);
@@ -74,8 +72,8 @@ function AddressSettings({ userId }) {
     };
 
     const url = isEditMode
-      ? `http://localhost:3001/api/addresses/${selectedAddressId}`
-      : `http://localhost:3001/api/addresses`;
+      ? `http://localhost:3001/api/user/addresses/${selectedAddressId}`
+      : `http://localhost:3001/api/user/addresses`;
 
     const method = isEditMode ? "PUT" : "POST";
 
@@ -103,7 +101,7 @@ function AddressSettings({ userId }) {
     if (window.confirm("Tem certeza que deseja remover este endereço?")) {
       try {
         const response = await fetch(
-          `http://localhost:3001/api/addresses/${selectedAddressId}`,
+          `http://localhost:3001/api/user/addresses/${selectedAddressId}`,
           { method: "DELETE" }
         );
         const data = await response.json();

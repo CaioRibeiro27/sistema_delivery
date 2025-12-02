@@ -20,7 +20,7 @@ function ClientMenu() {
   const fetchRestaurantInfo = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3001/api/restaurants/${id}`
+        `http://localhost:3001/api/restaurant/${id}`
       );
       const data = await response.json();
       if (data.success) setRestaurant(data.user);
@@ -31,7 +31,9 @@ function ClientMenu() {
 
   const fetchMenu = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/menu/${id}`);
+      const response = await fetch(
+        `http://localhost:3001/api/restaurant/menu/${id}`
+      );
       const data = await response.json();
       if (data.success) setMenuItems(data.items);
     } catch (error) {

@@ -11,7 +11,9 @@ function ProfileSettings({ userId }) {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/users/${userId}`);
+      const response = await fetch(
+        `http://localhost:3001/api/user/users/${userId}`
+      );
       const data = await response.json();
       if (data.success) setUserData(data.user);
     } catch (error) {
@@ -43,7 +45,7 @@ function ProfileSettings({ userId }) {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/api/users/${userId}`,
+        `http://localhost:3001/api/user/users/${userId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -77,13 +79,18 @@ function ProfileSettings({ userId }) {
     ) {
       try {
         const response = await fetch(
-          `http://localhost:3001/api/users/${userId}`,
+          `http://localhost:3001/api/user/users/${userId}`,
           { method: "DELETE" }
         );
-        if (response.ok) {
+
+        const data = await response.json();
+
+        if (data.success) {
           alert("Conta excluída.");
           localStorage.removeItem("user");
           navigate("/");
+        } else {
+          alert("Erro ao excluir: " + data.message);
         }
       } catch (error) {
         console.error(error);
@@ -104,6 +111,12 @@ function ProfileSettings({ userId }) {
           <p>
             <strong>Nome:</strong> {userData.nome.split(" ")[0]}
           </p>
+          <p>
+            <strong>Sobrenome:</strong>{" "}
+            {userData.nome.split(" ").length > 1
+              ? userData.nome.split(" ").slice(1).join(" ")
+              : ""}
+          </p>
         </div>
       </div>
 
@@ -119,10 +132,10 @@ function ProfileSettings({ userId }) {
           </button>
         </div>
 
-        {/* Linha Email (Apenas leitura) */}
+        {/* Linha Email (Apenas leitura)
         <div className="profile-option-row">
           <span>E-mail: {maskEmail(userData.email)}</span>
-        </div>
+        </div> */}
 
         {/* Linha Senha (Editável) */}
         <div className="profile-option-row">
@@ -149,7 +162,7 @@ function ProfileSettings({ userId }) {
                 <label>Telefone atual</label>
                 <input
                   type="text"
-                  value={userData.telefone}
+                  value={userData.telefone || ""}
                   disabled
                   className="input-disabled"
                 />

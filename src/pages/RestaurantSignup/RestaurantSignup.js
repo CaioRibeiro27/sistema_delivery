@@ -30,7 +30,7 @@ function RestaurantSignup() {
     e.preventDefault();
     try {
       const response = await fetch(
-        "http://localhost:3001/api/register-restaurant",
+        "http://localhost:3001/api/auth/register-restaurant",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

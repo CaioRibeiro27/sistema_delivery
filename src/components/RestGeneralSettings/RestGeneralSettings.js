@@ -17,7 +17,7 @@ function RestGeneralSettings({ restaurantId, isDarkMode, setIsDarkMode }) {
   const fetchAddress = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3001/api/restaurants/${restaurantId}/address`
+        `http://localhost:3001/api/restaurant/${restaurantId}/address`
       );
       const data = await response.json();
       if (data.success) {
@@ -37,7 +37,7 @@ function RestGeneralSettings({ restaurantId, isDarkMode, setIsDarkMode }) {
     e.preventDefault();
     try {
       const response = await fetch(
-        `http://localhost:3001/api/restaurants/${restaurantId}/address`,
+        `http://localhost:3001/api/restaurant/${restaurantId}/address`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
