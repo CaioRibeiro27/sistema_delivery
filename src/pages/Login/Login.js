@@ -23,7 +23,6 @@ function Login() {
       const data = await response.json();
 
       if (data.success) {
-        // Salva o usuário E o tipo dele
         localStorage.setItem(
           "user",
           JSON.stringify({ ...data.user, type: data.type })

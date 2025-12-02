@@ -53,6 +53,10 @@ function ProfileSettings({ userId }) {
       const data = await response.json();
 
       if (data.success) {
+        const currentUser = JSON.parse(localStorage.getItem("user"));
+        const updatedUser = { ...currentUser, ...body };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
         alert("Atualizado com sucesso!");
         setModalType(null);
         setInputValue("");

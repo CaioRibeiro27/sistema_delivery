@@ -8,11 +8,9 @@ function RestaurantMenu() {
   const [user, setUser] = useState(null);
   const [menuItems, setMenuItems] = useState([]);
 
-  // Estados do Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categoryToAdd, setCategoryToAdd] = useState("");
 
-  // Estados do Formulário
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
   const [preco, setPreco] = useState("");
@@ -64,15 +62,14 @@ function RestaurantMenu() {
         setIsModalOpen(false);
         setNome("");
         setDescricao("");
-        setPreco(""); // Limpa form
-        fetchMenu(user.id); // Atualiza lista
+        setPreco("");
+        fetchMenu(user.id);
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  // Função auxiliar para renderizar uma seção
   const renderSection = (title, categoryDB, buttonLabel) => {
     const items = menuItems.filter((item) => item.categoria === categoryDB);
 
@@ -80,7 +77,6 @@ function RestaurantMenu() {
       <div className="menu-section">
         <h3>{title}</h3>
 
-        {/* Lista de Itens Existentes */}
         <div className="items-list">
           {items.map((item) => (
             <div key={item.id_cardapio} className="menu-item-card">
@@ -89,7 +85,6 @@ function RestaurantMenu() {
                 <span>{item.descricao}</span>
                 <span className="price">R$ {item.preco}</span>
               </div>
-              {/* (Futuramente você pode por botão de editar/excluir aqui) */}
             </div>
           ))}
         </div>
@@ -126,7 +121,7 @@ function RestaurantMenu() {
         </div>
       </div>
 
-      {/* MODAL DE ADICIONAR ITEM */}
+      {/* Adicionar item */}
       {isModalOpen && (
         <div className="modal-overlay">
           <form className="modal-form" onSubmit={handleAddItem}>

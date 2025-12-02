@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./RestaurantDashboard.css";
 import { useNavigate } from "react-router-dom";
-// 1. IMPORTAR A SIDEBAR REAL
 import Sidebar from "../../components/Sidebar/Sidebar";
 
 function RestaurantDashboard() {
@@ -10,8 +9,6 @@ function RestaurantDashboard() {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderItems, setOrderItems] = useState([]);
-
-  // 2. ESTADO DA SIDEBAR (Igual na Home)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -83,21 +80,13 @@ function RestaurantDashboard() {
 
   return (
     <div className="dashboard-container">
-      {/* 3. USAR A SIDEBAR REAL */}
-      <Sidebar
-        isOpen={isSidebarOpen}
-        setIsOpen={setIsSidebarOpen}
-        // Você pode passar funções vazias ou personalizadas para o menu do restaurante aqui depois
-      />
-
-      {/* 4. CONTEÚDO QUE EMPURRA (Logica igual da Home) */}
+      <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
       <div
         className={`dashboard-content ${
           isSidebarOpen ? "sidebar-open" : "sidebar-closed"
         }`}
         onClick={() => isSidebarOpen && setIsSidebarOpen(false)}
       >
-        {/* CARD PRINCIPAL (Engloba Header e Pedidos para parecer um bloco só) */}
         <div className="main-card">
           <div className="dashboard-header">
             <h2>{user ? user.nome : "Restaurante"}</h2>
@@ -114,7 +103,7 @@ function RestaurantDashboard() {
           </div>
 
           <div className="orders-area">
-            {/* COLUNA ESQUERDA */}
+            {/* Coluna esquerda */}
             <div className="orders-list-col">
               <h3>Lista de pedidos</h3>
               <div className="orders-scroll">
@@ -138,7 +127,7 @@ function RestaurantDashboard() {
               </div>
             </div>
 
-            {/* COLUNA DIREITA */}
+            {/* Coluna direita */}
             <div className="order-details-col">
               <h3>Detalhes do pedidos</h3>
 
@@ -164,7 +153,6 @@ function RestaurantDashboard() {
                   </div>
 
                   <div className="action-area">
-                    {/* (Seus botões de ação continuam iguais aqui) */}
                     {selectedOrder.statusPedido === "Em_andamento" && (
                       <button
                         className="btn-accept"

@@ -15,6 +15,7 @@ import RestaurantSignup from "./pages/RestaurantSignup/RestaurantSignup";
 import Home from "./pages/Home/Home";
 import Settings from "./pages/Settings/Settings";
 import ClientMenu from "./pages/ClientMenu/ClientMenu";
+import Cart from "./pages/Cart/Cart";
 
 // Páginas do restaurante
 import RestaurantDashboard from "./pages/RestaurantDashboard/RestaurantDashboard";
@@ -54,6 +55,15 @@ function App() {
           element={
             <ProtectedRoute>
               <ClientMenu />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/carrinho"
+          element={
+            <ProtectedRoute>
+              <Cart />
             </ProtectedRoute>
           }
         />

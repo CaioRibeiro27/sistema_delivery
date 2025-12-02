@@ -785,6 +785,141 @@ app.post("/api/auth/google", async (req, res) => {
   }
 });
 
+app.post("/api/orders", (req, res) => {
+  const {
+    id_usuario,
+    id_restaurante,
+    valor_total,
+    forma_pagamento,
+    itens,
+    id_endereco,
+  } = req.body;
+  const data_pedido = new Date().toISOString().slice(0, 19).replace("T", " ");
+  const sqlOrder =
+    "INSERT INTO pedido (id_usuario, id_restaurante, valor_total, forma_pagamento, statusPedido, data_pedido, id_endereco) VALUES (?, ?, ?, ?, 'Em_andamento', ?, ?)";
+
+  db.query(
+    sqlOrder,
+    [
+      id_usuario,
+      id_restaurante,
+      valor_total,
+      forma_pagamento,
+      data_pedido,
+      id_endereco,
+    ],
+    (err, result) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .json({ success: false, message: "Erro ao criar pedido." });
+      }
+
+      const id_pedido = result.insertId;
+      const values = itens.map((item) => [
+        item.quantidade,
+        item.preco,
+        id_pedido,
+        item.id_cardapio,
+      ]);
+      const sqlItems =
+        "INSERT INTO pedido_itens (quantidade, preco_unitario, id_pedido, id_cardapio) VALUES ?";
+
+      db.query(sqlItems, [values], (errItems) => {
+        if (errItems) {
+          console.error(errItems);
+          return res
+            .status(500)
+            .json({ success: false, message: "Erro ao adicionar itens." });
+        }
+        res.status(201).json({
+          success: true,
+          message: "Pedido realizado com sucesso!",
+          orderId: id_pedido,
+        });
+      });
+    }
+  );
+});
+
+app.post("/api/orders", (req, res) => {
+  const {
+    id_usuario,
+    id_restaurante,
+    valor_total,
+    forma_pagamento,
+    itens,
+    id_endereco,
+  } = req.body;
+  const data_pedido = new Date().toISOString().slice(0, 19).replace("T", " ");
+  const sqlOrder =
+    "INSERT INTO pedido (id_usuario, id_restaurante, valor_total, forma_pagamento, statusPedido, data_pedido, id_endereco) VALUES (?, ?, ?, ?, 'Em_andamento', ?, ?)";
+
+  db.query(
+    sqlOrder,
+    [
+      id_usuario,
+      id_restaurante,
+      valor_total,
+      forma_pagamento,
+      data_pedido,
+      id_endereco,
+    ],
+    (err, result) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .json({ success: false, message: "Erro ao criar pedido." });
+      }
+
+      const id_pedido = result.insertId;
+      const values = itens.map((item) => [
+        item.quantidade,
+        item.preco,
+        id_pedido,
+        item.id_cardapio,
+      ]);
+      const sqlItems =
+        "INSERT INTO pedido_itens (quantidade, preco_unitario, id_pedido, id_cardapio) VALUES ?";
+
+      db.query(sqlItems, [values], (errItems) => {
+        if (errItems)
+          return res
+            .status(500)
+            .json({ success: false, message: "Erro itens." });
+        res.status(201).json({ success: true, message: "Pedido realizado!" });
+      });
+    }
+  );
+});
+
+app.get("/api/restaurant/:restaurantId/orders", (req, res) => {
+  const { restaurantId } = req.params;
+
+  const sql = `
+    SELECT 
+      p.id_pedido, 
+      p.valor_total, 
+      p.statusPedido, 
+      p.data_pedido,
+      u.nome as nome_cliente,
+      e.rua, e.numero, e.bairro, ue.localizacao -- Dados precisos do endereço escolhido
+    FROM pedido p
+    JOIN usuario u ON p.id_usuario = u.id_usuario
+    JOIN endereco e ON p.id_endereco = e.id_endereco -- JOIN direto com o endereço do pedido
+    LEFT JOIN usuario_endereco ue ON (ue.id_endereco = e.id_endereco AND ue.id_usuario = u.id_usuario) -- Só pra pegar o apelido (Casa/Trabalho)
+    WHERE p.id_restaurante = ?
+    ORDER BY p.data_pedido DESC
+  `;
+
+  db.query(sql, [restaurantId], (err, results) => {
+    if (err) return res.status(500).json({ success: false });
+    res.status(200).json({ success: true, orders: results });
+  });
+});
+
 app.listen(port, () => {
   console.log(`🚀 Servidor backend rodando na porta ${port}`);
 });

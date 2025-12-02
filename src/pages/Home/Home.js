@@ -24,7 +24,7 @@ function Home() {
   }, []);
 
   const fetchData = async (userId) => {
-    // 1. Busca Restaurantes
+    // Busca Restaurantes
     try {
       const resRest = await fetch("http://localhost:3001/api/restaurants");
       const dataRest = await resRest.json();

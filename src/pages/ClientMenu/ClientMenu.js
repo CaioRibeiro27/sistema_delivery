@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./ClientMenu.css";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaPlus } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/Sidebar";
 
@@ -10,6 +10,7 @@ function ClientMenu() {
   const [restaurant, setRestaurant] = useState(null);
   const [menuItems, setMenuItems] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [cart, setCart] = useState([]);
 
   useEffect(() => {
     fetchRestaurantInfo();
@@ -38,9 +39,27 @@ function ClientMenu() {
     }
   };
 
+  const addToCart = (item) => {
+    setCart((prevCart) => {
+      const existing = prevCart.find((i) => i.id_cardapio === item.id_cardapio);
+      if (existing) {
+        return prevCart.map((i) =>
+          i.id_cardapio === item.id_cardapio
+            ? { ...i, quantidade: i.quantidade + 1 }
+            : i
+        );
+      } else {
+        return [...prevCart, { ...item, quantidade: 1 }];
+      }
+    });
+  };
+
+  const goToCart = () => {
+    navigate("/carrinho", { state: { cart, restaurant } });
+  };
+
   const renderCategory = (title, categoryDB) => {
     const items = menuItems.filter((item) => item.categoria === categoryDB);
-
     if (items.length === 0) return null;
 
     return (
@@ -51,11 +70,15 @@ function ClientMenu() {
             <div key={item.id_cardapio} className="client-menu-item">
               <div className="item-header">
                 <span className="item-name">{item.nome_produto}</span>
-                <span className="item-dots"></span>{" "}
-                {/* O truque dos pontinhos */}
-                <span className="item-price">
-                  R$ {item.preco.replace(".", ",")}
-                </span>
+                <span className="item-dots"></span>
+                <span className="item-price">R$ {item.preco}</span>
+
+                <button
+                  className="add-btn-small"
+                  onClick={() => addToCart(item)}
+                >
+                  <FaPlus />
+                </button>
               </div>
               <p className="item-desc">({item.descricao})</p>
             </div>
@@ -65,6 +88,8 @@ function ClientMenu() {
     );
   };
 
+  const totalItems = cart.reduce((acc, curr) => acc + curr.quantidade, 0);
+
   return (
     <div className="client-menu-container">
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
@@ -73,7 +98,6 @@ function ClientMenu() {
         className={`client-menu-content ${
           isSidebarOpen ? "sidebar-open" : "sidebar-closed"
         }`}
-        onClick={() => isSidebarOpen && setIsSidebarOpen(false)}
       >
         <div className="paper-card">
           <div className="paper-header">
@@ -86,8 +110,17 @@ function ClientMenu() {
             {renderCategory("APERITIVOS", "Aperitivos")}
           </div>
 
-          <div className="paper-footer" onClick={() => navigate("/home")}>
-            <FaArrowLeft size={24} />
+          <div className="paper-footer">
+            <FaArrowLeft
+              size={24}
+              onClick={() => navigate("/home")}
+              style={{ cursor: "pointer" }}
+            />
+            {totalItems > 0 && (
+              <button className="btn-next-cart" onClick={goToCart}>
+                Próximo ({totalItems})
+              </button>
+            )}
           </div>
         </div>
       </div>
