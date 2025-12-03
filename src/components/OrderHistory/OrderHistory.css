@@ -20,7 +20,10 @@
   width: 90%;
   max-width: 400px;
   padding: 20px;
-  z-index: 1501;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .history-container h2 {
@@ -28,12 +31,21 @@
   margin-top: 0;
   font-family: Arial, sans-serif;
   color: #333;
+  flex-shrink: 0;
 }
 
 .order-list {
+  overflow-y: auto;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
+  padding-right: 5px;
+  margin-top: 10px;
+}
+
+.order-list::-webkit-scrollbar {
+  width: 6px;
 }
 
 .order-item {

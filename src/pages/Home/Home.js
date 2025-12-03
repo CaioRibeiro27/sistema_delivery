@@ -3,11 +3,13 @@ import "./Home.css";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { FaSearch, FaStore, FaUtensils } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import OrderHistory from "../../components/OrderHistory/OrderHistory";
 
 function Home() {
   const [user, setUser] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   // Estados de Dados
   const [restaurants, setRestaurants] = useState([]);
@@ -52,7 +54,11 @@ function Home() {
 
   return (
     <div className="home-container-layout">
-      <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        setIsOpen={setIsSidebarOpen}
+        onHistoryClick={() => setIsHistoryOpen(true)}
+      />
 
       <div
         className={`home-content ${
@@ -103,7 +109,6 @@ function Home() {
             </div>
 
             <div className="right-column">
-              {/* Box de Status */}
               <div className="status-box">
                 <h3>Status</h3>
                 <div className="status-content">
@@ -144,6 +149,12 @@ function Home() {
           </div>
         </div>
       </div>
+      {isHistoryOpen && user && (
+        <OrderHistory
+          userId={user.id}
+          onClose={() => setIsHistoryOpen(false)}
+        />
+      )}
     </div>
   );
 }

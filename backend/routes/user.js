@@ -326,4 +326,27 @@ router.get("/:userId/active-order", (req, res) => {
   });
 });
 
+//Rota historico
+router.get("/:userId/orders", (req, res) => {
+  const { userId } = req.params;
+
+  const sql = `
+    SELECT p.id_pedido, p.data_pedido, p.valor_total, p.statusPedido, r.nome as nome_restaurante
+    FROM pedido p
+    JOIN restaurante r ON p.id_restaurante = r.id_restaurante
+    WHERE p.id_usuario = ?
+    ORDER BY p.data_pedido DESC
+  `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro ao buscar histórico." });
+    }
+    res.status(200).json({ success: true, orders: results });
+  });
+});
+
 module.exports = router;

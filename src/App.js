@@ -8,7 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 // Páginas Públicas
 import Login from "./pages/Login/Login";
 import Selection from "./pages/Selection/Selection";
-import Signup from "./pages/Signup/Signup"; // Cadastro Usuário
+import Signup from "./pages/Signup/Signup";
 import RestaurantSignup from "./pages/RestaurantSignup/RestaurantSignup";
 
 // Páginas do usuário
