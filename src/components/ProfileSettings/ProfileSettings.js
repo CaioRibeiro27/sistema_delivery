@@ -8,6 +8,7 @@ function ProfileSettings({ userId }) {
   const [userData, setUserData] = useState(null);
   const [modalType, setModalType] = useState(null);
   const [inputValue, setInputValue] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
 
   const fetchUserData = async () => {
     try {
@@ -26,14 +27,16 @@ function ProfileSettings({ userId }) {
   }, [userId]);
 
   const maskPhone = (phone) => {
-    if (!phone) return "";
-    return `(${phone.substring(0, 2)}) 9****-****`;
-  };
+    if (!phone) return "Não cadastrado";
 
-  const maskEmail = (email) => {
-    if (!email) return "";
-    const [name, domain] = email.split("@");
-    return `${name.substring(0, 1)}***@${domain}`;
+    const numbers = phone.replace(/\D/g, "");
+
+    if (numbers.length === 11) {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(
+        7
+      )}`;
+    }
+    return phone;
   };
 
   const handleUpdate = async (e) => {
@@ -41,7 +44,8 @@ function ProfileSettings({ userId }) {
     let body = {};
 
     if (modalType === "telefone") body = { telefone: inputValue };
-    if (modalType === "senha") body = { novaSenha: inputValue };
+    if (modalType === "senha")
+      body = { novaSenha: inputValue, senhaAtual: currentPassword };
 
     try {
       const response = await fetch(
@@ -63,6 +67,7 @@ function ProfileSettings({ userId }) {
         setModalType(null);
         setInputValue("");
         fetchUserData();
+        setCurrentPassword("");
       } else {
         alert("Erro: " + data.message);
       }
@@ -132,11 +137,6 @@ function ProfileSettings({ userId }) {
           </button>
         </div>
 
-        {/* Linha Email (Apenas leitura)
-        <div className="profile-option-row">
-          <span>E-mail: {maskEmail(userData.email)}</span>
-        </div> */}
-
         {/* Linha Senha (Editável) */}
         <div className="profile-option-row">
           <span>Alterar senha</span>
@@ -180,6 +180,18 @@ function ProfileSettings({ userId }) {
               />
             </div>
 
+            {modalType === "senha" && (
+              <div className="form-group">
+                <label>Senha Atual</label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  required
+                  placeholder="Digite sua senha atual"
+                />
+              </div>
+            )}
             <div className="form-buttons">
               <button type="submit" className="btn-avancar">
                 Avançar

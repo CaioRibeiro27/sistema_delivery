@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Cart.css";
-import { FaArrowLeft, FaMinus, FaTrash } from "react-icons/fa";
+import { FaArrowLeft, FaMinus } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/Sidebar";
 
@@ -14,13 +14,22 @@ function Cart() {
 
   const [cart, setCart] = useState(initialCart);
   const [paymentMethod, setPaymentMethod] = useState("Dinheiro");
+
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState("");
+  const [cards, setCards] = useState([]);
+
+  useEffect(() => {
+    if (!restaurant || !initialCart) {
+      navigate("/home");
+    }
+  }, []);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
       fetchAddresses(user.id);
+      fetchCards(user.id);
     }
   }, []);
 
@@ -33,6 +42,18 @@ function Cart() {
       if (data.success && data.addresses.length > 0) {
         setAddresses(data.addresses);
         setSelectedAddressId(data.addresses[0].id_endereco);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const fetchCards = async (userId) => {
+    try {
+      const res = await fetch(`http://localhost:3001/api/user/cards/${userId}`);
+      const data = await res.json();
+      if (data.success) {
+        setCards(data.cards);
       }
     } catch (e) {
       console.error(e);
@@ -77,6 +98,18 @@ function Cart() {
       return;
     }
 
+    // Validação de cartão
+    if (paymentMethod === "Cartao" && cards.length === 0) {
+      if (
+        window.confirm(
+          "Você selecionou pagamento por Cartão, mas não possui nenhum cadastrado. Deseja ir para as configurações adicionar um?"
+        )
+      ) {
+        navigate("/configuracoes");
+      }
+      return;
+    }
+
     const orderData = {
       id_usuario: user.id,
       id_restaurante: restaurant.id_restaurante,
@@ -103,6 +136,8 @@ function Cart() {
       console.error(e);
     }
   };
+
+  if (!restaurant) return null;
 
   return (
     <div className="cart-container-layout">
@@ -180,9 +215,24 @@ function Cart() {
                     ))}
                   </select>
                 ) : (
-                  <span style={{ color: "red", fontSize: "0.9rem" }}>
-                    Sem endereço cadastrado
-                  </span>
+                  <button
+                    style={{
+                      color: "#2563EB",
+                      backgroundColor: "transparent",
+                      border: "1px solid #2563EB",
+                      borderRadius: "6px",
+                      padding: "6px 12px",
+                      fontSize: "0.875rem",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                    onClick={() => navigate("/configuracoes")}
+                  >
+                    + Adicionar endereço
+                  </button>
                 )}
               </div>
             </div>

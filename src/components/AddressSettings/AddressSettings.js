@@ -4,8 +4,6 @@ import { FaPlus, FaMapMarkerAlt } from "react-icons/fa";
 
 function AddressSettings({ userId }) {
   const [addresses, setAddresses] = useState([]);
-
-  // Controle de Modais
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
@@ -116,6 +114,31 @@ function AddressSettings({ userId }) {
     }
   };
 
+  const checkCEP = async (e) => {
+    const cepDigitado = e.target.value.replace(/\D/g, ""); // Remove traços/pontos
+
+    if (cepDigitado.length === 8) {
+      try {
+        const res = await fetch(
+          `https://viacep.com.br/ws/${cepDigitado}/json/`
+        );
+        const data = await res.json();
+
+        if (!data.erro) {
+          setRua(data.logradouro);
+          setBairro(data.bairro);
+          setCidade(data.localidade);
+
+          document.getElementById("numero").focus();
+        } else {
+          alert("CEP não encontrado.");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar CEP:", error);
+      }
+    }
+  };
+
   return (
     <div className="address-content">
       <h2>Gerenciar endereços</h2>
@@ -147,7 +170,6 @@ function AddressSettings({ userId }) {
         </div>
       </div>
 
-      {/* MODAL */}
       {isModalOpen && (
         <div className="address-modal-overlay">
           <form className="address-modal-form" onSubmit={handleSave}>
@@ -186,6 +208,9 @@ function AddressSettings({ userId }) {
                 type="text"
                 value={cep}
                 onChange={(e) => setCep(e.target.value)}
+                onBlur={checkCEP}
+                placeholder="00000-000"
+                maxLength="9"
                 required
               />
             </div>

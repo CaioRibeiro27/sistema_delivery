@@ -49,6 +49,35 @@ function RestaurantSignup() {
     }
   };
 
+  const checkCEP = async (e) => {
+    const cepDigitado = e.target.value.replace(/\D/g, "");
+
+    if (cepDigitado.length === 8) {
+      try {
+        const res = await fetch(
+          `https://viacep.com.br/ws/${cepDigitado}/json/`
+        );
+        const data = await res.json();
+
+        if (!data.erro) {
+          setFormData((prev) => ({
+            ...prev,
+            rua: data.logradouro,
+            bairro: data.bairro,
+            cidade: data.localidade,
+            estado: data.uf,
+          }));
+
+          document.getElementById("numero").focus();
+        } else {
+          alert("CEP não encontrado.");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar CEP:", error);
+      }
+    }
+  };
+
   return (
     <div className="signup-container">
       {step === 1 && (
@@ -127,6 +156,7 @@ function RestaurantSignup() {
               id="cep"
               value={formData.cep}
               onChange={handleChange}
+              onBlur={checkCEP}
             />
             <InputGroup
               label="Bairro"

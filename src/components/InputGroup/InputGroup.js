@@ -1,7 +1,7 @@
-import React from 'react';
-import './InputGroup.css';
+import React from "react";
+import "./InputGroup.css";
 
-function InputGroup({ label, type, id, value, onChange }) {
+function InputGroup({ label, type, id, value, onChange, onBlur }) {
   return (
     <div className="input-group">
       <label htmlFor={id}>{label}</label>
@@ -10,6 +10,7 @@ function InputGroup({ label, type, id, value, onChange }) {
         id={id}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         required
       />
     </div>

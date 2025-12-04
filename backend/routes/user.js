@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const db = require("../db");
 
-// --- PERFIL ---
+// Perfil
 router.get("/users/:userId", (req, res) => {
   const { userId } = req.params;
   const sql =
@@ -16,9 +16,60 @@ router.get("/users/:userId", (req, res) => {
   });
 });
 
+// Atualizar perfil (telefone e senha)
 router.put("/users/:userId", async (req, res) => {
   const { userId } = req.params;
-  const { telefone, email, novaSenha } = req.body;
+  const { telefone, email, novaSenha, senhaAtual } = req.body;
+
+  if (novaSenha) {
+    if (!senhaAtual) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Senha atual é obrigatória." });
+    }
+    const sqlCheck = "SELECT senha FROM usuario WHERE id_usuario = ?";
+
+    db.query(sqlCheck, [userId], async (errCheck, resultsCheck) => {
+      if (errCheck || resultsCheck.length === 0) {
+        return res
+          .status(500)
+          .json({ success: false, message: "Erro ao verificar usuário." });
+      }
+
+      const currentHash = resultsCheck[0].senha;
+
+      if (!currentHash) {
+        return res.status(400).json({
+          success: false,
+          message: "Contas Google não possuem senha para alterar.",
+        });
+      }
+
+      const isMatch = await bcrypt.compare(senhaAtual, currentHash);
+
+      if (!isMatch) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Senha atual incorreta." });
+      }
+
+      const newHashedPassword = await bcrypt.hash(novaSenha, 10);
+      const sqlUpdate = "UPDATE usuario SET senha = ? WHERE id_usuario = ?";
+
+      db.query(sqlUpdate, [newHashedPassword, userId], (errUp) => {
+        if (errUp)
+          return res
+            .status(500)
+            .json({ success: false, message: "Erro ao atualizar senha." });
+
+        res
+          .status(200)
+          .json({ success: true, message: "Senha alterada com sucesso!" });
+      });
+    });
+
+    return;
+  }
 
   let sql = "";
   let params = [];
@@ -26,13 +77,6 @@ router.put("/users/:userId", async (req, res) => {
   if (telefone) {
     sql = "UPDATE usuario SET telefone = ? WHERE id_usuario = ?";
     params = [telefone, userId];
-  } else if (email) {
-    sql = "UPDATE usuario SET email = ? WHERE id_usuario = ?";
-    params = [email, userId];
-  } else if (novaSenha) {
-    const hashedPassword = await bcrypt.hash(novaSenha, 10);
-    sql = "UPDATE usuario SET senha = ? WHERE id_usuario = ?";
-    params = [hashedPassword, userId];
   } else {
     return res
       .status(400)
